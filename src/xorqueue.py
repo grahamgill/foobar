@@ -1,4 +1,6 @@
 import operator
+
+
 def xorqueue(start, length):
     """
         xorqueue(start: int, length: int)
@@ -25,13 +27,21 @@ def xorqueue(start, length):
     29
     ```
     to give the result 14.
+
+    Queue can't wrap after worker 2000000000, because they'd reorganise themselves to be in
+    increasing ID order and with no gaps.
     """
 
-    assert 0 <= start <= 2000000000, "start promised to be between 0 and 2000000000 inclusive, but got " + repr(start)
-    assert 1 <= length <= 2000000001, "length promised to be positive and cannot be more than 2000000001 unique IDs, but got " + repr(length)
-    # assert start - 1 + length**2 <= 2000000000, "IDs promised to lie between 0 and 2000000000 inclusive, but got final ID at checkpoint " + repr(start - 1 + length**2)
+    assert start >= 0, "start promised to be between nonnegative, but got " + \
+        repr(start)
+    assert length >= 1, "length promised to be positive, but got " + \
+        repr(length)
+    assert start - 1 + length**2 <= 2000000000, """all worker IDs promised to lie between 0 and 2000000000 inclusive,
+            and be strictly increasing with no gaps, but then implied final ID at checkpoint is """ + \
+        repr(start - 1 + length**2)
 
-    checkpointqueue = [k % 2000000001 for j in range(0, length) for k in range(start + j * length, start + (j + 1) * length - j)]
+    checkpointqueue = [k for j in range(0, length) for k in range(
+        start + j * length, start + (j + 1) * length - j)]
     # print(checkpointqueue)
 
     return reduce(operator.xor, checkpointqueue, 0)
