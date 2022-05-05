@@ -30,6 +30,10 @@ def xorqueue(start, length):
 
     Queue can't wrap after worker 2000000000, because they'd reorganise themselves to be in
     increasing ID order and with no gaps.
+
+    Verifier complains about solution with list comprehension, so reworking to eliminate it and
+    replace by a nested for loop. List comprehension could lead to very big and/or slow list, but
+    we don't need to store a list, we just need to accumulate them with xor.
     """
 
     assert start >= 0, "start promised to be between nonnegative, but got " + \
@@ -37,11 +41,12 @@ def xorqueue(start, length):
     assert length >= 1, "length promised to be positive, but got " + \
         repr(length)
     assert start - 1 + length**2 <= 2000000000, """all worker IDs promised to lie between 0 and 2000000000 inclusive,
-            and be strictly increasing with no gaps, but then implied final ID at checkpoint is """ + \
+            and be strictly increasing with no gaps, but the implied final ID at checkpoint is """ + \
         repr(start - 1 + length**2)
 
-    checkpointqueue = [k for j in range(0, length) for k in range(
-        start + j * length, start + (j + 1) * length - j)]
-    # print(checkpointqueue)
+    checksum = 0
+    for j in range(0, length):
+        for k in range(start + j * length, start + (j + 1) * length - j):
+            checksum ^= k
 
-    return reduce(operator.xor, checkpointqueue, 0)
+    return checksum
