@@ -86,3 +86,72 @@ def xorqueue(start, length):
             checksum ^= k
 
     return checksum
+
+
+def _xorqueue(start, length):
+    checksum = 0
+    length_1 = length - 1
+    for j in range(0, length):
+        checksum ^= xor_x_to_y(start + j * length, start + (j + 1) * length_1)
+
+    return checksum
+
+
+def xor_to_y(y):
+    """
+        xor_to_y(y : int)
+    For `y > 0`, computes `0 ^ ... ^ y` efficiently, using Euclidean algorithm and the fact
+    that `4n ^ (4n + 1) ^ (4n + 2) ^ (4n + 3) == 0`. If `y = 4n + k`, with `0 <= k <= 3`, we have
+    `0 ^ ... ^ y ==` 
+        * `4n == y`, if `k == 0`;
+        * `4n ^ (4n + 1) == 1`, if `k == 1`;
+        * `4n ^ (4n + 1) ^ (4n + 2) == 4n + 3 == y + 1`, if `k == 2`;
+        * `4n ^ (4n + 1) ^ (4n + 2) ^ (4n + 3) == 0`, if `k == 3`.
+
+    For `y < 0` computes `y ^ ... ^ 0`.
+
+    When `y == 0` returns 0.
+    """
+    # assert type(y) == type(1) or type(y) == type(1L), "y must be int or long, but got type(y)==" + repr(type(y))
+    k = y % 4
+
+    if y >= 0:
+        if k % 2: # k odd
+            if k == 1:
+                return 1
+            else: # k == 3
+                return 0
+        else: # k even
+            if k: # k == 2
+                return y + 1
+            else: # k == 0
+                return y
+
+    else:   # y < 0
+        if k % 2: # k odd
+            if k == 1:
+                return y - 1
+            else: # k == 3
+                return y
+        else: # k even
+            if k: # k == 2
+                return 1
+            else: # k == 0
+                return 0
+
+
+def xor_x_to_y(x, y):
+    if x > y:
+        x, y = y, x
+    
+    if x > 0:
+        return xor_to_y(x - 1) ^ xor_to_y(y)
+    elif x == 0:
+        return xor_to_y(y)
+    elif y < 0:
+        return xor_to_y(x) ^ xor_to_y(y + 1)
+    elif y == 0:
+        return xor_to_y(x)
+    else: # x < 0 < y
+        return xor_to_y(x) ^ xor_to_y(y)
+        
