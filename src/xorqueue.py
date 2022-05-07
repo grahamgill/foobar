@@ -79,17 +79,6 @@ def xorqueue(start, length):
         repr(start - 1 + length**2)
 
     checksum = 0
-    for j in range(0, length):
-        for k in range(start + j * length, start + (j + 1) * length - j):
-            if k > MAX_WORKER_ID:
-                break
-            checksum ^= k
-
-    return checksum
-
-
-def _xorqueue(start, length):
-    checksum = 0
     length_1 = length - 1
     for j in range(0, length):
         checksum ^= xor_x_to_y(start + j * length, start + (j + 1) * length_1)
@@ -141,6 +130,10 @@ def xor_to_y(y):
 
 
 def xor_x_to_y(x, y):
+    """
+        xor_x_to_y(x: int, y: int)
+    Returns x ^ ... ^ y if x < y, y ^ ... ^ x if y < x, and y if y == x.
+    """
     if x > y:
         x, y = y, x
     
