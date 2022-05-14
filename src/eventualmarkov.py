@@ -66,7 +66,7 @@ def eventualmarkov(m):
     # U[0][0] == E[0][0] == 1.
     #
     # We can make a similar argument about the other diagonal elements to show that E is just the square identity 
-    # matrix. It's stated in the problem that every state will go to an absorbing state, which means E is the identity
+    # matrix. It's stated in the problem that every state will go to an absorbing state, which means E must be the identity
     # matrix. (We can assume the unobserved states are absorbing since there's no way to get to them from state 0.)
     #
     # Note that we only care about the first row of E, and we only care that it is of the 
@@ -77,7 +77,7 @@ def eventualmarkov(m):
     # Once again, we operate directly on A and B instead of introducing new matrices.
     backsubstitution(A, B, n)
 
-    # At least, B[0] gives us what we want, and we just need to convert from fraction back to
+    # At last, B[0] gives us what we want, and we just need to convert from fraction back to
     # integer and append the denominator.
     soln = convert_to_common_denominator(B[0])
 
@@ -179,7 +179,7 @@ def backsubstitution(U, B, n):
 
 def convert_to_common_denominator(v):
     """
-    `v` is a vector of Fractions. We convert each element of 
+    `v` is a vector of `Fraction`s. We convert each element of 
     `v` to a common denominator, and return the numerators in 
     a list with the denominator appended.
     """
@@ -212,7 +212,7 @@ def add(r1, r2):
 
 def mul(r, s):
     """
-    Multiply row `r by scalar `s`.
+    Multiply row `r` by scalar `s`.
     """
     return [x * s for x in r]
 
