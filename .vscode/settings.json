@@ -1,3 +1,4 @@
 {
-    "python.defaultInterpreterPath": "python2"
+    "python.defaultInterpreterPath": "python2",
+    "python.analysis.typeCheckingMode": "basic"
 }
