@@ -9,13 +9,13 @@ def solution(x, y):
   g = bombgenerations(m, f)
   return 'impossible' if g < 0 else str(g)
 
-def bombgenerations(m, f):
+def bombgenerations_slow(m, f):
   """
-  bombgenerations(m : int, f : int) : int
+  bombgenerations_slow(m : int, f : int) : int
 
   m: needed number of Mach bombs
   f: needed number of Facula bombs
-  bombgenerations(m, f): smallest bomb replication generation (>= 0) at which m, f are achieved,
+  bombgenerations_slow(m, f): smallest bomb replication generation (>= 0) at which m, f are achieved,
     starting from 1 Mach and 1 Facula bomb, or -1 if it is impossible to achieve m, f.
 
   We proceed with an approach like breadth first search. Given a number of M and F bombs (x, y),
@@ -114,10 +114,75 @@ def bombgenerations(m, f):
   return -1 if solution_not_found else generation
 
 
+def bombgenerations(m, f):
+  """
+  bombgenerations(m : int, f : int) : int
+
+  m: needed number of Mach bombs
+  f: needed number of Facula bombs
+  bombgenerations(m, f): smallest bomb replication generation (>= 0) at which m, f are achieved,
+    starting from 1 Mach and 1 Facula bomb, or -1 if it is impossible to achieve m, f.
+
+  In this approach we work backwards from a desired pair (m, f) to see if we can get to an initial set
+  of (M, F) bombs (1, 1).
+
+  The algorithm is in fact exactly the Euclidean algorithm for computing gcd(m, f), where the successive
+  quotients count generations, and the final step is to reach a pair (gcd(m, f), 0). If m and f are
+  coprime then gcd(m, f) = 1 and from (1, 0) we can produce (1, 1) in one generation, so the generation
+  count we return is 1 less than the sum of successive quotients we've computed.
+
+  On the other hand, if gcd(m, f) > 1, then we have no way of reaching (1, 1) and there is no solution.
+  There is no way to reach (m, f) by starting with (1, 1) and successively producing either (M+F, F) or
+  (M, M+F) in the next generation from (M, F) in the current generation. Notice that gcd(M, F) =
+  gcd(M+F, F) = gcd(M, M+F), and so gcd(m, f) and gcd(1, 1) = 1 must be equal for the process to produce
+  (m, f) from (1, 1) eventually.
+
+  We don't really need to import `gcd` from `fractions` since what we want is the Euclidean algorithm step
+  results, not just computation of the greatest common divisor.
+  """
+  assert m >= 0 and f >= 0, "Require nonnegative Mach and Facula targets, but got m == " + repr(m) + ", f == " + repr(f)
+  assert m <= 10**50 and f <= 10**50, "Require Mach and Facula targets both <= 10^50, but got m == " + repr(m) + ", f == " + repr(f)
+
+  generations = 0
+  while f > 0:
+    q, r = divmod(m, f)
+    generations += q
+    m, f = f, r
+  # now m = gcd of original m, f
+
+  return generations - 1 if m == 1 else -1
+
+
 # test cases
 def tests():
   assert solution('1', '2') == '1'
   assert solution('2', '1') == '1'
   assert solution('1', '1') == '0'
   assert solution('2', '4') == 'impossible'
+
+  assert bombgenerations_slow(1000, 1000) == -1
+  assert bombgenerations_slow(1000, 999) == 999
+  assert bombgenerations_slow(12, 7) == 5
+  assert bombgenerations_slow(11, 9) == 6
+  assert bombgenerations_slow(9, 11) == 6
+
+  assert bombgenerations_slow(0, 100) == -1
+  assert bombgenerations_slow(10**50, 1) == 10**50 - 1
+  assert bombgenerations_slow(1, 10**10) == 10**10 - 1
+
+  assert bombgenerations(1000, 1000) == -1
+  assert bombgenerations(1000, 999) == 999
+  assert bombgenerations(12, 7) == 5
+  assert bombgenerations(11, 9) == 6
+  assert bombgenerations(9, 11) == 6
+
+  assert bombgenerations(0, 100) == -1
+  assert bombgenerations(100, 0) == -1
+  assert bombgenerations(0, 0) == -1
+  assert bombgenerations(10**50, 1) == 10**50 - 1
+  assert bombgenerations(1, 10**10) == 10**10 - 1
+
+  assert bombgenerations(10**50, 10**50) == -1
+  assert bombgenerations(10**50 - 1, 10**50) == 10**50 - 1
+  assert bombgenerations(10**50, 10**50 - 1) == 10**50 - 1
   return True
