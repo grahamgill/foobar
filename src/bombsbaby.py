@@ -31,7 +31,7 @@ def bombgenerations_slow(m, f):
 
   We prune paths of the binary tree when we know a branch leads only to non-solutions. Then we know that we can
   stop searching with no solution when both the current and next generations' queues are empty, and return
-  the error value -1.
+  the error value -1. (Except we need to handle a special case of pruning - see below.)
 
   OK this one's no good a solution. It explodes combinatorially in early generations when m and f are large, since
   there's little pruning that can apply. Eventually pruning takes over and reduces the queue count in each generation
@@ -52,7 +52,7 @@ def bombgenerations_slow(m, f):
   # generation counter and solution flag
   generation = 0
   solution_not_found = True
-  solution_exists_at_generation = 10**100 # upper bound on number of generations required
+  solution_exists_at_generation = 10**100 # upper bound (not tight) on number of generations required
 
   # queues for holding current node level (generation) in tree and constructing child level (next generation)
   # at the root (generation 0) we start with (1, 1) representing 1 M and 1 F bomb
@@ -88,8 +88,6 @@ def bombgenerations_slow(m, f):
       else:
         # M < m and F < f
         newbombcount = M + F
-        M_left, F_left = newbombcount, F
-        M_right, F_right = M, newbombcount
         # we can show that if newbombcount > m or f, the whole subtree rooted here is unviable
         if newbombcount <= m and newbombcount <= f:
           next_generation.extend([(newbombcount, F), (M, newbombcount)])
@@ -105,7 +103,7 @@ def bombgenerations_slow(m, f):
           solution_not_found = False
 
   # either we have a solution here, or we've run out of tuples to check
-  # if we've run out of tuples it could be that we know a future generation solution exists, but
+  # if we've run out of tuples it could be that we know a smallest future generation solution exists, but
   # tree pruning means we won't actually get to visit it, so then report that as solution
   if solution_not_found and solution_exists_at_generation < 10**100:
     solution_not_found = False
@@ -126,7 +124,22 @@ def bombgenerations(m, f):
   In this approach we work backwards from a desired pair (m, f) to see if we can get to an initial set
   of (M, F) bombs (1, 1).
 
-  The algorithm is in fact exactly the Euclidean algorithm for computing gcd(m, f), where the successive
+  Notice there's only one way to do this. Suppose we're at a node (M, F). Could it be a child along more
+  than one branch from (1, 1)? Suppose along one branch (M, F) = (M' + F', F') where (M', F') is its parent, but
+  along another branch (M, F) = (M'' + F'', F'') where (M'', F'') is its parent. Then clearly F' = F = F'' and
+  hence M'' = M' also, so the parents also have the same value. Or, (M, F) = (M''', M''' + F'''). But then
+  M''' = M' + F' > F' = M''' + F''' > M''': impossible. (An symmetrical argument can be made if along the original
+  branch (M, F) = (M', M' + F') instead.) We can show by induction then that along all branches which
+  go from (1, 1) to a node (M, F) all nodes at the same generation have the same value, and in particular all branches
+  have the same length (so any one of them is the "shortest" branch). That's enough to not care about which branch
+  we're on, finding the shortest branch. But we can go further. We can show that no two distinct nodes at the same
+  generation have the same value. Certainly it's true at generation 1: the children of (1, 1) (generation 0 only node)
+  are (2, 1) and (1, 2). Now suppose it is true at generation N > 0, but at generation N + 1 node (M, F) occurs twice.
+  The previous argument shows then at generation N the parents of the two (M, F) nodes must also be equal, which
+  contradicts the induction hypothesis. Thus all nodes in the tree rooted at (1, 1) are distinct.
+
+  The algorithm we use to find the path from (m, f) back to (1, 1) (if it exists) is in fact exactly 
+  the Euclidean algorithm for computing gcd(m, f), where the successive
   quotients count generations, and the final step is to reach a pair (gcd(m, f), 0). If m and f are
   coprime then gcd(m, f) = 1 and from (1, 0) we can produce (1, 1) in one generation, so the generation
   count we return is 1 less than the sum of successive quotients we've computed.
@@ -136,6 +149,8 @@ def bombgenerations(m, f):
   (M, M+F) in the next generation from (M, F) in the current generation. Notice that gcd(M, F) =
   gcd(M+F, F) = gcd(M, M+F), and so gcd(m, f) and gcd(1, 1) = 1 must be equal for the process to produce
   (m, f) from (1, 1) eventually.
+
+  As a side note, the infinite tree rooted at (1, 1) produces every ordered pair of coprime positive integers!
 
   We don't really need to import `gcd` from `fractions` since what we want is the Euclidean algorithm step
   results, not just computation of the greatest common divisor.
