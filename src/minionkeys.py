@@ -203,3 +203,7 @@ def tests():
     [3, 6, 8, 9]
   ]
   assert solution(5, 5) == [[0], [1], [2], [3], [4]]
+
+  assert comb(9, 4) == comb(9, 5)
+  assert comb(9, 0) == comb(9, 9) == 1
+  assert comb(9, 1) == comb(9, 8) == 9
