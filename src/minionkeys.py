@@ -1,4 +1,4 @@
-import itertools
+from itertools import combinations
 from math import factorial
 
 """
@@ -78,13 +78,13 @@ Output:
 """
 
 
-def solution(m, n):
+def solution(num_buns, num_required):
   """
   In this problem we have to assign keys to minions from a consecutive sequence starting at 0.
 
   The minions control a locked mechanism with their keys. The mechanism can be operated by a set of minions each holding the right keys.
 
-  We are given a pool of `m` minions available to operate the mechanism, and a number `n` of them which is the minimum number to unlock the mechanism.
+  We are given a pool of `m` (`num_buns`) minions available to operate the mechanism, and a number `n` (`num_required`) of them which is the minimum number to unlock the mechanism.
 
   The requirement is that any subset of `n` minions from the pool of `m` must hold, together, the complete set of keys. Any subset of `n-1` minions
   (or fewer) from the pool must not hold a complete set of keys, so that the mechanism cannot be operated by fewer than `n` minions from the pool.
@@ -122,18 +122,90 @@ def solution(m, n):
 
   We have the following limits: `m` is an integer in the range 1 to 9, inclusive. `n` is an integer in the range 0 to 9 inclusive.
   """
-  pass
+  # check for valid inputs
+  assert 1 <= num_buns <= 9, "Invalid number of bunnies"
+  assert 0 <= num_required <= 9, "Invalid number of required bunnies"
+  assert num_required <= num_buns, "Number of bunnies required must be less-equal to number of bunnies available"
 
-def comb(m, n):
+  # compute number of unique keys, number of keys held by each bunny, and number of holders of each key
+  unique_keys, keys_held, key_holders = keycount(num_buns, num_required)
+
+  # Next form the list of holders of each key.
+  # The index in the list is the key ID.
+  # The entry at index `k` is the keyholder IDs of key `k`.
+  # We want the list in lexicographic order by lists of keyholders.
+  # Example: input (4, 3), gives `4 choose 2 = 6` unique keys, `3 choose 2 = 3` keys held by each bunny,
+  # and 2 holders for each key.
+  # Then we want key 0 to go to bunnies (0,1), key 1 to bunnies (0,2), key 2 to bunnies (0,3),
+  # key 3 to bunnies (1,2), key 4 to bunnies (1,3), key 5 to bunnies (2,3). This results in bunny 0
+  # holding keys (0,1,2), bunny 1 holding (0,3,4), bunny 2 holding (1,3,5), bunny 3 holding (2,4,5).
+  holders_by_key = list(combinations(range(num_buns), key_holders)) if key_holders > 0 else []
+
+  # Length of `key_by_holders` is `num_buns choose key_holders == num_buns choose num_required-1 == unique_keys`.
+  assert len(holders_by_key) == unique_keys
+
+  # Now we need to "transpose" this list to get the keys held by each holder.
+  keys_by_holder = [[] for k in range(num_buns)]
+  for k in range(unique_keys):
+    for h in holders_by_key[k]:
+      keys_by_holder[h].append(k)
+
+  assert len(keys_by_holder[0]) == keys_held
+
+  return keys_by_holder
+
+
+def keycount(m, n):
   """
-    comb(m : int, n : int) : int
+    keycount(m : int, n : int) : int
+  Given `m` keyholders of which any `n` (`n <= m`) must hold a complete set, but any `n-1` or fewer
+  hold an incomplete set, compute the smallest number of unique keys required, and the count of keys
+  each keyholder must hold.
+
+  Observe that if `n` must hold a complete set but `n-1` an incomplete set, then every one of the `X = m choose n-1`
+  `(n-1)`-tuples of keyholders must be missing a unique key, for if two such `(n-1)`-tuples were missing the same key, we could
+  find `n` keyholders which together did not hold a complete set.
+
+  So there are `X` unique keys.
+
+  Fix a particular keyholder, say 0. There are `m-1 choose n-2` tuples among the `X` `(n-1)`-tuples which include 0, and there are
+  `m-1 choose n-1` which do not contain 0. (And in fact we have the identity in general that `p-1 choose q-1 + p-1 choose q = p choose q`.)
+
+  When keyholder 0 is in one of the `X` `(n-1)`-tuples it is missing the corresponding key. So this says that keyholder 0 must be missing
+  `m-1 choose n-2` keys and must hold `m-1 choose n-1` keys. By symmetry, each keyholder must hold `m-1 choose n-1` of the keys. 
+
+  How many holders hold one key? From the calculation of `X`, the number of unique keys, we see that a given key is not held by
+  `n-1` holders, and so `m-(n-1)` holders must hold the key.
+
+  Returns the number of unique keys, the count of keys held by each keyholder and the number of holders who hold each key.
+  """
+  # assertions already met in `solution`
+  # assert m >= 1, "Need at least one keyholder m"
+  # assert 0 <= n <= m, "Required keyholders n must be nonnegative and no greater than available keyholders m"
+
+  if n == 0:
+    return 0, 0, 0
+
+  p = n - 1
+  unique_keys = choose(m, p)
+  keys_held = choose(m - 1, p)
+  key_holders = m - p # will never be 0 since `0 <= p < m`
+
+  return unique_keys, keys_held, key_holders
+
+
+def choose(m, n):
+  """
+    choose(m : int, n : int) : int
     m >= 0
     0 <= n <= m
 
-  Returns `m` choose `n`.
+  Returns `m choose n`.
   """
-  assert m >= 0, "m must be nonnegative integer"
-  assert 0 <= n <= m, "n must be nonnegative integer no greater than m"
+  # these conditions already met by assertions in `solution`
+  # assert m >= 0, "m must be nonnegative integer"
+  # assert 0 <= n <= m, "n must be nonnegative integer no greater than m"
+  
   p = m - n
   if p > n:
     n, p = p, n
@@ -145,7 +217,6 @@ def comb(m, n):
 
 
 def tests():
-  pass
 
   assert solution(1, 0) == [[]]
   assert solution(1, 1) == [[0]]
@@ -204,6 +275,20 @@ def tests():
   ]
   assert solution(5, 5) == [[0], [1], [2], [3], [4]]
 
-  assert comb(9, 4) == comb(9, 5)
-  assert comb(9, 0) == comb(9, 9) == 1
-  assert comb(9, 1) == comb(9, 8) == 9
+  assert choose(9, 4) == choose(9, 5)
+  assert choose(9, 0) == choose(9, 9) == 1
+  assert choose(9, 1) == choose(9, 8) == 9
+
+  assert keycount(0, 0) == (0, 0, 0)
+  assert keycount(9, 0) == (0, 0, 0)
+  assert keycount(9, 1) == (1, 1, 9)
+  assert keycount(9, 2) == (9, 8, 8)
+  assert keycount(9, 3) == (36, 28, 7)
+  assert keycount(9, 4) == (84, 56, 6)
+  assert keycount(9, 5) == (126, 70, 5)
+  assert keycount(9, 6) == (126, 56, 4)
+  assert keycount(9, 7) == (84, 28, 3)
+  assert keycount(9, 8) == (36, 8, 2)
+  assert keycount(9, 9) == (9, 1, 1)
+
+  return True
