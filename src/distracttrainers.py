@@ -38,3 +38,11 @@ Output:
     2
 """
 
+"""
+Strategy
+
+First we need to determine whether each possible pair of bunny trainers leads to a non-terminating loop of thumb wrestling games, or terminates with both trainers ending up with an equal number of bananas.
+
+To do this we'll first sort the trainers by increasing number of bananas held initially. The termination/nontermination decision function took a bit of work to discover, but not that hard and a proof that it is the right function will be provided in a PDF separately at github.com/grahamgill
+"""
+
