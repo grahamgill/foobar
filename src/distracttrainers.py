@@ -41,8 +41,39 @@ Output:
 """
 Strategy
 
-First we need to determine whether each possible pair of bunny trainers leads to a non-terminating loop of thumb wrestling games, or terminates with both trainers ending up with an equal number of bananas.
+First we need to determine whether each possible pair of bunny trainers leads to a nonterminating loop of thumb wrestling games, 
+or terminates with both trainers ending up with an equal number of bananas.
 
-To do this we'll first sort the trainers by increasing number of bananas held initially. The termination/nontermination decision function took a bit of work to discover, but not that hard and a proof that it is the right function will be provided in a PDF separately at github.com/grahamgill
+To do this we'll first sort the trainers by nondecreasing number of bananas held initially. The termination/nontermination decision 
+function took a bit of work to discover, but not that hard and a proof that it is the right function will be provided in a PDF 
+separately at github.com/grahamgill/foobar/doc.
+
+We'll only consider banana pairs (m,n) with m <= n, since (n,m) gives the same termination/nontermination outcome, and a game 
+match between trainer i and trainer j is the same game match as between trainer j and trainer i. The list of trainers sorted by 
+nondecreasing number of bananas held lets us do this easily. If the sorted N trainers are labelled 0..N-1, then we don't need to 
+consider a match between trainer k and trainer k (which would be terminating in any case), but we only need to consider matches
+between trainer k (0 <= k < N-1) on the left and trainers k+1..N-1 on the right. The right hand trainers are guaranteed to have at 
+least as many bananas as trainer k because of the sort.
+
+After we know which pairings of bunny trainers will not terminate their games, we need to find the largest set of nonterminating 
+bunny trainer pairs. This is a job for bipartite graph maximum cardinality matching. If we have a list of N bunny trainers, our 
+graph will have N-1 vertices on the left side representing trainers 0..N-2 in left hand positions of matches, and N-1 vertices on 
+the right side representing trainers 1..N-1 in right hand positions of matches. A directed edge from left hand side to right hand 
+side will be indicated with a 1 if the pair of trainers will have a nonterminating game, and 0 - no edge - otherwise.
+
+We'll use the Edmonds-Karp algorithm to compute a maximum "flow" over our graph by adding a source vertex with edges to all left 
+side vertices with capacity 1, and a sink vertex with edges from all right hand vertices with capacity 1. The directed edge indicators
+of 1 in the bipartite graph will also represent the flow capacities between left side and right side vertices.
+
+The maximum flow will give us exactly the number of edges in a maximum cardinality matching. We don't care what the actual edges are.
+If the max flow is K, then 2K trainers are occupied in nonterminating games, leaving N-2K trainers in terminating games (or unmatched,
+in case of an odd number of trainers).
+
+We report N-2K as the solution.
+
+Invaluable pages:
+* https://en.wikipedia.org/wiki/Maximum_flow_problem#Maximum_cardinality_bipartite_matching
+* https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm
+I adapted the python implementation of Edmonds-Karp from the python example provided on the second page.
 """
 
