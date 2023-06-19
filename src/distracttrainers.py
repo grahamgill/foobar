@@ -46,7 +46,7 @@ or terminates with both trainers ending up with an equal number of bananas.
 
 To do this we'll first sort the trainers by nondecreasing number of bananas held initially. The termination/nontermination decision 
 function took a bit of work to discover, but not that hard and a proof that it is the right function will be provided in a PDF 
-separately at github.com/grahamgill/foobar/doc.
+separately at github.com/grahamgill/foobar/doc/terminating_bunny_trainer_transforms.pdf.
 
 We'll only consider banana pairs (m,n) with m <= n, since (n,m) gives the same termination/nontermination outcome, and a game 
 match between trainer i and trainer j is the same game match as between trainer j and trainer i. The list of trainers sorted by 
@@ -77,3 +77,123 @@ Invaluable pages:
 I adapted the python implementation of Edmonds-Karp from the python example provided on the second page.
 """
 
+from fractions import gcd
+
+def solution(trainerbananas):
+    """
+    Returns smallest number of trainers who will not be in a match after a finite amount of time.
+    
+    `trainerbananas` is a list of the number of bananas possessed by each trainer.
+    """
+
+    num_trainers = len(trainerbananas)
+
+    # check for valid inputs
+    # zero length list is invalid, but we can accept it
+    assert num_trainers <= 100, "Trainer bananas list too long, > 100"
+    assert all(map(lambda x: isinstance(x, int), trainerbananas)), "Trainer bananas list includes non-int"
+    assert all(map(lambda x: 1 <= x <= 2**30-1, trainerbananas)), "Trainer banana count outside range 1 to 2**30-1 inclusive"
+
+    # If no trainers then none to worry about not being in a match.
+    # If only one trainer, then no way to keep that trainer occupied in a thumb wrestling match,
+    # so will have 1 not in a match.
+    if num_trainers in {0, 1}:
+        return num_trainers
+
+    # so now at least two trainers, so we can put trainers into game matches
+    # sort the trainer bananas count list
+    tbs = sorted(trainerbananas)
+
+
+    return 0
+
+
+def bunnytrainertransform(m, n):
+    """
+    This is the transformation (m, n) --> (2m, n - m) (if m <= n) described in the problem, with
+    result (p, q) normalised so we always have p <= q.
+
+    Note that we don't actually use this function in the solution. It's just here for reference.
+    """
+    if m > n:
+        m, n = n, m
+    
+    x = 2 * m
+    y = n - m
+
+    if x > y:
+        x, y = y, x
+    
+    return x, y
+
+
+def btt_sequence_terminates(m, n):
+    """
+    Repeated application of the bunnytrainertransform to (m, n), both positive integers, will eventually terminate 
+    with equal terms in the tuple (or, if you like, with a zero in the tuple, which is the next step after equal
+    terms) iff
+        (m + n)/d == 2^k for some positive integer k
+    where d == gcd(m, n).
+
+    The proof of this proposition is in github.com/grahamgill/foobar/doc/terminating_bunny_trainer_transforms.pdf.
+
+    Returns True if the sequence terminates, and False if it is nonterminating. `m` and `n` must be nonnegative
+    integers.
+    """
+    assert m >= 0 and n >= 0, "Only nonnegative inputs allowed"
+
+    # if either m or n is zero, the sequence has already terminated
+    if not (m and n):
+        return True
+    
+    # so both m, n > 0
+    d = gcd(m, n)
+    # hence x and y are at least 2
+    x = y = m/d + n/d
+
+    # count powers of 2 in y
+    k = 0
+    while not (y & 1):
+        y >>= 1
+        k += 1
+    
+    # is x a power of 2?
+    # I suppose we could have used `log` to base 2 as well and checked that it's an integer
+    return x == 2 ** k
+
+
+def tests():
+
+    assert bunnytrainertransform(3, 3) == (0, 6)
+    assert bunnytrainertransform(4, 2) == (2, 4)
+    assert bunnytrainertransform(1, 5) == (2, 4)
+    assert bunnytrainertransform(3, 4) == (1, 6)
+
+    assert btt_sequence_terminates(0, 0)
+    assert btt_sequence_terminates(1, 0)
+    assert btt_sequence_terminates(1, 1)
+    assert not btt_sequence_terminates(1, 2)
+    assert btt_sequence_terminates(1, 7)
+    assert btt_sequence_terminates(1, 3)
+    assert not btt_sequence_terminates(1, 21)
+    assert not btt_sequence_terminates(1, 13)
+    assert not btt_sequence_terminates(1, 19)
+    assert not btt_sequence_terminates(7, 3)
+    assert btt_sequence_terminates(7, 21)
+    assert not btt_sequence_terminates(7, 13)
+    assert not btt_sequence_terminates(7, 19)
+    assert btt_sequence_terminates(3, 21)
+    assert btt_sequence_terminates(3, 13)
+    assert not btt_sequence_terminates(3, 19)
+    assert not btt_sequence_terminates(21, 13)
+    assert not btt_sequence_terminates(21, 19)
+    assert btt_sequence_terminates(13, 19)
+
+    assert solution([]) == 0
+    assert solution([2]) == 1
+    assert solution([1,1]) == 2
+    assert solution([1,1,1]) == 3
+
+    assert solution([1, 7, 3, 21, 13, 19]) == 0
+
+    return True

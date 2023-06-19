@@ -1,8 +1,4 @@
 {
     "python.defaultInterpreterPath": "python2",
-    "python.analysis.typeCheckingMode": "basic",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8"
-    },
-    "python.formatting.provider": "none"
+    "python.analysis.typeCheckingMode": "basic"
 }
