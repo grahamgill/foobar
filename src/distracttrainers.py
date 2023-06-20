@@ -76,6 +76,8 @@ also randomised algorithms giving approximations which, for small examples, may 
 
 If we have a maximal/maximum matching consisting of K edges, then that occupies 2K trainers, leaving N-2K watchful trainers. We return
 N-2K.
+
+Woohoo! It worked!
 """
 
 from fractions import gcd
