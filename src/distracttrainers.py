@@ -74,10 +74,11 @@ We report N-2K as the solution.
 Invaluable pages:
 * https://en.wikipedia.org/wiki/Maximum_flow_problem#Maximum_cardinality_bipartite_matching
 * https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm
-I adapted the python implementation of Edmonds-Karp from the python example provided on the second page.
+I took the python implementation of Edmonds-Karp from the python example provided on the second page.
 """
 
 from fractions import gcd
+from collections import deque
 
 def solution(trainerbananas):
     """
@@ -89,7 +90,7 @@ def solution(trainerbananas):
     num_trainers = len(trainerbananas)
 
     # check for valid inputs
-    # zero length list is invalid, but we can accept it
+    # zero length list is invalid input according to rules, but we can accept it
     assert num_trainers <= 100, "Trainer bananas list too long, > 100"
     assert all(map(lambda x: isinstance(x, int), trainerbananas)), "Trainer bananas list includes non-int"
     assert all(map(lambda x: 1 <= x <= 2**30-1, trainerbananas)), "Trainer banana count outside range 1 to 2**30-1 inclusive"
@@ -104,8 +105,36 @@ def solution(trainerbananas):
     # sort the trainer bananas count list
     tbs = sorted(trainerbananas)
 
+    # to store nonterminating pairs of trainers in adjacency matrix
+    # we need N-1 trainers on the left (0..N-2), N-1 trainers on the right (1..N-1)
+    # plus when we consider the network flow we'll have to add source and sink nodes,
+    # for a total of 2N vertices in the graph
+    graph = emptyflowcapacitymatrix(2 * num_trainers)
+    left = range(num_trainers - 1)
+    right = range(num_trainers + 1, 2 * num_trainers)
+    source = num_trainers - 1
+    sink = num_trainers
 
-    return 0
+    # add edges/unit capacities for nonterminating trainer pairs, directed from left to right
+    for i in left:
+        for j in range(i + 1, num_trainers):
+            if not btt_sequence_terminates(tbs[i], tbs[j]):
+                graph[i][num_trainers + j] = 1
+    
+    # add unit capacities from source to left
+    for j in left:
+        graph[source][j] = 1
+    
+    # add unit capacities from right to sink
+    for i in right:
+        graph[i][sink] = 1
+
+    # compute maximum flow in graph
+    # this is guaranteed to be a nonnegative integer
+    maxflow = edmonds_karp_maxflow(graph, source, sink)
+
+
+    return maxflow
 
 
 def bunnytrainertransform(m, n):
@@ -121,10 +150,7 @@ def bunnytrainertransform(m, n):
     x = 2 * m
     y = n - m
 
-    if x > y:
-        x, y = y, x
-    
-    return x, y
+    return (y, x) if x > y else (x, y)
 
 
 def btt_sequence_terminates(m, n):
@@ -160,6 +186,121 @@ def btt_sequence_terminates(m, n):
     # is x a power of 2?
     # I suppose we could have used `log` to base 2 as well and checked that it's an integer
     return x == 2 ** k
+
+
+def emptyflowcapacitymatrix(num_vertices):
+    """
+    Represents the flow capacities along edges of a directed graph.
+    As long as we're fine with vertex labels that are integers starting from 0, then
+    there's no need to store more.
+
+    If a capacity is 0 that's indistinguishable from having no edge between the vertices. So 
+    we have:
+    graph[x][y] = k iff there is an edge from x to y with capacity k. graph[x][y] == 0 otherwise.
+
+    This structure generalises an adjacency matrix of a directed graph, where we set the capacity
+    to 1 iff there is an edge from x to y and to 0 otherwise. (If the matrix is symmetric, we can
+    use it to represent an undirected graph also.)
+
+    Returns an empty flow capacity matrix for num_vertices vertices, i.e. all edge capacities are zero.
+
+    If we needed more than this, e.g. if we needed to store flows as well as capacities, we'd make this
+    its own class.
+    
+    For the bunny trainer distraction problem, we need 2N vertices where N <= 100 is the number
+    of trainers. So an adjacency matrix could take up 40000 cells. This is probably ok.
+    In fact because the trainer pairing is a bipartite graph we'll only need an eighth of the adjacency
+    matrix at most, and when we use the matrix to represent unit capacities in a network flow
+    we'll have to represent back flow, so we'll use at most a quarter of the adjacency matrix.
+    Possibly we could consider sparse matrices, but it's not worth the extra effort and an eighth
+    to a quarter (at most, admittedly) isn't *that* sparse.
+    """
+
+    return [[0] * num_vertices for k in range(num_vertices)]
+
+
+def bfs_sourcetosinkresidualpath(g, s, t, parent):
+    """
+    Returns True if there is a path from source `s` to sink `t` in residual graph `g`,
+    using breadth first search.
+
+    Also fills `parent[]` to store the path.
+
+    `len(g)` should give the number of vertices of `g`. An edge/capacity from `u` to `v` in `g`
+    should be accessible via `g[u][v]`.
+    """
+
+    # Mark all the vertices as not visited
+    visited = [False] * len(g)
+
+    # Create a queue for BFS
+    queue = deque()
+
+    # Mark the source node as visited and enqueue it
+    queue.append(s)
+    visited[s] = True
+
+    # Standard BFS loop
+    while queue:
+        u = queue.popleft()
+
+        # Get all adjacent vertices of the dequeued vertex u.
+        # If an adjacent has not been visited, then mark it
+        # visited and enqueue it.
+        for v, residualcapacity in enumerate(g[u]):
+            if (visited[v] == False) and (residualcapacity > 0):
+                queue.append(v)
+                visited[v] = True
+                parent[v] = u
+
+    # If we reached sink in BFS starting from source, then return
+    # True for path found, else return False.
+    return visited[t]
+
+
+def edmonds_karp_maxflow(graph, source, sink):
+    """
+    Returns the maximum flow from `source` to `sink` in the given `graph`,
+    using Edmonds-Karp algorithm.
+
+    Note that `graph` is altered by this function.
+
+    Initially, when there is no flow, the residual graph is just equal to 
+    `graph`. But as we proceed we update `graph` as the representation of the
+    residual graph flow capacities.
+
+    `len(graph)` should give the number of vertices in `graph`.
+    """
+
+    # This array is filled by BFS and to store path
+    parent = [-1] * len(graph)
+
+    max_flow = 0  # There is no flow initially
+
+    # Augment the flow while there is path from source to sink
+    while bfs_sourcetosinkresidualpath(graph, source, sink, parent):
+        # Find minimum residual capacity of the edges along the
+        # path filled by BFS. Or we can say find the maximum flow
+        # through the path found.
+        path_flow = float("Inf")
+        s = sink
+        while s != source:
+            path_flow = min(path_flow, graph[parent[s]][s])
+            s = parent[s]
+
+        # Add path flow to overall flow
+        max_flow += path_flow
+
+        # update residual capacities of the edges and reverse edges
+        # along the path
+        v = sink
+        while v != source:
+            u = parent[v]
+            graph[u][v] -= path_flow
+            graph[v][u] += path_flow
+            v = u
+
+    return max_flow
 
 
 def tests():
