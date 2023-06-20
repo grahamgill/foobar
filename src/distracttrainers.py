@@ -56,29 +56,30 @@ between trainer k (0 <= k < N-1) on the left and trainers k+1..N-1 on the right.
 least as many bananas as trainer k because of the sort.
 
 After we know which pairings of bunny trainers will not terminate their games, we need to find the largest set of nonterminating 
-bunny trainer pairs. This is a job for bipartite graph maximum cardinality matching. If we have a list of N bunny trainers, our 
-graph will have N-1 vertices on the left side representing trainers 0..N-2 in left hand positions of matches, and N-1 vertices on 
-the right side representing trainers 1..N-1 in right hand positions of matches. A directed edge from left hand side to right hand 
-side will be indicated with a 1 if the pair of trainers will have a nonterminating game, and 0 - no edge - otherwise.
+bunny trainer pairs. This is a maximum cardinality matching in a general graph, since in general the graph will have odd cycles
+(e.g. the test example [1, 7, 3, 21, 13, 19]) and thus will not be bipartite.
 
-We'll use the Edmonds-Karp algorithm to compute a maximum "flow" over our graph by adding a source vertex with edges to all left 
-side vertices with capacity 1, and a sink vertex with edges from all right hand vertices with capacity 1. The directed edge indicators
-of 1 in the bipartite graph will also represent the flow capacities between left side and right side vertices.
+The graph we construct has an edge for all nonterminating bunny trainer matchups. So in the example we have edges (1, 13), (1, 21),
+(13, 21), giving a 3-cycle.
 
-The maximum flow will give us exactly the number of edges in a maximum cardinality matching. We don't care what the actual edges are.
-If the max flow is K, then 2K trainers are occupied in nonterminating games, leaving N-2K trainers in terminating games (or unmatched,
-in case of an odd number of trainers).
+We'll try a greedy matching algorithm which takes a remaining edge with least incidence to other edges at each step. Removing the edge
+will disconnect its incident vertices from the graph, which will change the edge incidence count for remaining edges. We can get a
+maximal cardinality matching in this way but are not guaranteed to get the maximum cardinality matching. However this is much simpler
+to code up and will run more quickly, so I'm hoping this will be good enough for foobar to trick the bunny trainers. After all I'm
+under the gun here, the station is starting to disintegrate, so I don't have the time for a perfect algorithm.
 
-We report N-2K as the solution.
+If it turns out we really need the maximum cardinality matching, we'll have to implement Edmonds' blossom algorithm (or adapt some
+code from online). Hopefully not. There are asymptotically better algorithms than the blossom algorithm but they're more complex and
+their improvement in worst bounds does not guarantee their runtime is any better on average and relatively small examples. There are
+also randomised algorithms giving approximations which, for small examples, may give the maximum with probability only epsilon less than
+1. Anyway, we'll see.
 
-Invaluable pages:
-* https://en.wikipedia.org/wiki/Maximum_flow_problem#Maximum_cardinality_bipartite_matching
-* https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm
-I took the python implementation of Edmonds-Karp from the python example provided on the second page.
+If we have a maximal/maximum matching consisting of K edges, then that occupies 2K trainers, leaving N-2K watchful trainers. We return
+N-2K.
 """
 
 from fractions import gcd
-from collections import deque
+# from collections import deque
 
 def solution(trainerbananas):
     """
@@ -105,36 +106,56 @@ def solution(trainerbananas):
     # sort the trainer bananas count list
     tbs = sorted(trainerbananas)
 
-    # to store nonterminating pairs of trainers in adjacency matrix
-    # we need N-1 trainers on the left (0..N-2), N-1 trainers on the right (1..N-1)
-    # plus when we consider the network flow we'll have to add source and sink nodes,
-    # for a total of 2N vertices in the graph
-    graph = emptyflowcapacitymatrix(2 * num_trainers)
-    left = range(num_trainers - 1)
-    right = range(num_trainers + 1, 2 * num_trainers)
-    source = num_trainers - 1
-    sink = num_trainers
+    # store nonterminating pairs of trainers in adjacency matrix graph
+    graph = AdjacencyGraph(num_trainers)
 
-    # add edges/unit capacities for nonterminating trainer pairs, directed from left to right
-    for i in left:
+    # add edges for nonterminating trainer pairs
+    for i in range(num_trainers - 1):
         for j in range(i + 1, num_trainers):
             if not btt_sequence_terminates(tbs[i], tbs[j]):
-                graph[i][num_trainers + j] = 1
-    
-    # add unit capacities from source to left
-    for j in left:
-        graph[source][j] = 1
-    
-    # add unit capacities from right to sink
-    for i in right:
-        graph[i][sink] = 1
+                graph.addedge(i, j)
 
-    # compute maximum flow in graph
-    # this is guaranteed to be a nonnegative integer
-    maxflow = edmonds_karp_maxflow(graph, source, sink)
+    # so now construct a list of edges with their incidence counts and mark an edge with least
+    # incidence count
+    edgelist = list() 
+    minincidencecount = float("Inf") 
+    minincidenceindex = None
+    for i in range(num_trainers - 1):
+        for j in range(i + 1, num_trainers):
+            if graph.inE(i, j):
+                c = graph.edgeincidencecount(i, j)
+                edgelist.append((i, j))
+                if c < minincidencecount:
+                    minincidencecount = c
+                    minincidenceindex = len(edgelist) - 1
 
+    # build maximal (but not necessarily maximum :( ) list of trainer match pairs using
+    # greedy algorithm described under Strategy
+    trainermatches = list()
+    while minincidenceindex is not None:
+        # add min incidence count edge to matches list
+        u, v = edgelist[minincidenceindex]
+        trainermatches.append((u, v))
 
-    return maxflow
+        # disconnect vertices u and v from graph
+        graph.disconnectvertex(u)
+        graph.disconnectvertex(v)
+
+        # construct reduced edgelist of remaining edges
+        el = list()
+        minincidencecount = float("Inf")
+        minincidenceindex = None
+        for i, j in edgelist:
+            if graph.inE(i, j):
+                c = graph.edgeincidencecount(i, j)
+                el.append((i, j))
+                if c < minincidencecount:
+                    minincidencecount = c
+                    minincidenceindex = len(el) - 1
+
+        edgelist = el
+
+    return num_trainers - 2 * len(trainermatches)
 
 
 def bunnytrainertransform(m, n):
@@ -188,119 +209,76 @@ def btt_sequence_terminates(m, n):
     return x == 2 ** k
 
 
-def emptyflowcapacitymatrix(num_vertices):
+class AdjacencyGraph:
     """
-    Represents the flow capacities along edges of a directed graph.
-    As long as we're fine with vertex labels that are integers starting from 0, then
-    there's no need to store more.
+    Undirected graph based on adjacency matrix representation.
+    Constructor returns a graph with `num_vertices` vertices labelled 0..(`num_vertices`-1)
+    and no edges.
+    * Vertex labels are in `V`.
+    * Edges are in adjacency matrix `E`: 1 if edge, 0 if not.
+    * Number of vertices is in `cardV`.
+    * Number of edges is in `cardE`.
+    * Degree of each vertex is in `degrees`.
 
-    If a capacity is 0 that's indistinguishable from having no edge between the vertices. So 
-    we have:
-    graph[x][y] = k iff there is an edge from x to y with capacity k. graph[x][y] == 0 otherwise.
+    Supports:
+    * inV: vertex membership test
+    * inE: edge membership test
+    * addedge: add edge
+    * deledge: remove edge
+    * disconnectvertex: remove all edges incident to a vertex
+    * edgeincidencecount: number of edges incident on a given edge
+    """
 
-    This structure generalises an adjacency matrix of a directed graph, where we set the capacity
-    to 1 iff there is an edge from x to y and to 0 otherwise. (If the matrix is symmetric, we can
-    use it to represent an undirected graph also.)
-
-    Returns an empty flow capacity matrix for num_vertices vertices, i.e. all edge capacities are zero.
-
-    If we needed more than this, e.g. if we needed to store flows as well as capacities, we'd make this
-    its own class.
+    def __init__(self, num_vertices):
+        self.V = range(num_vertices)
+        self.degrees = [0] * num_vertices
+        self.E = [[0] * num_vertices for k in range(num_vertices)]
+        self.cardV = num_vertices
+        self.cardE = 0
     
-    For the bunny trainer distraction problem, we need 2N vertices where N <= 100 is the number
-    of trainers. So an adjacency matrix could take up 40000 cells. This is probably ok.
-    In fact because the trainer pairing is a bipartite graph we'll only need an eighth of the adjacency
-    matrix at most, and when we use the matrix to represent unit capacities in a network flow
-    we'll have to represent back flow, so we'll use at most a quarter of the adjacency matrix.
-    Possibly we could consider sparse matrices, but it's not worth the extra effort and an eighth
-    to a quarter (at most, admittedly) isn't *that* sparse.
-    """
+    def inE(self, v1, v2):
+        return bool(self.E[v1][v2])
 
-    return [[0] * num_vertices for k in range(num_vertices)]
+    def inV(self, v):
+        return 0 <= v < self.cardV
 
+    def addedge(self, v1, v2):
+        if not self.E[v1][v2]:
+            self.E[v1][v2] = 1
+            self.cardE += 1
+            self.degrees[v1] += 1
+            if v2 != v1:
+                self.E[v2][v1] = 1
+                self.degrees[v2] += 1
+    
+    def deledge(self, v1, v2):
+        if self.E[v1][v2]:
+            self.E[v1][v2] = 0
+            self.cardE -= 1
+            self.degrees[v1] -= 1
+            if v2 != v1:
+                self.E[v2][v1] = 0
+                self.degrees[v2] -= 1
+    
+    def disconnectvertex(self, v):
+        for u in self.V:
+            self.degrees[u] -= self.E[u][v]
+            self.cardE -= self.E[u][v]
+            self.E[u][v] = 0
 
-def bfs_sourcetosinkresidualpath(g, s, t, parent):
-    """
-    Returns True if there is a path from source `s` to sink `t` in residual graph `g`,
-    using breadth first search.
+        self.E[v] = [0] * self.cardV
+        self.degrees[v] = 0
+    
+    def edgeincidencecount(self, v1, v2):
+        """
+        If `(v1, v2)` is an edge in `E`, return its edge incidence count, including itself, i.e.
+        the number of edges incident to `v1` plus the number of edges incident to `v2` other than 
+        `(v1, v2)` itself again (so we don't double count it). The incidence count is always at least
+        one for an edge of the graph.
 
-    Also fills `parent[]` to store the path.
-
-    `len(g)` should give the number of vertices of `g`. An edge/capacity from `u` to `v` in `g`
-    should be accessible via `g[u][v]`.
-    """
-
-    # Mark all the vertices as not visited
-    visited = [False] * len(g)
-
-    # Create a queue for BFS
-    queue = deque()
-
-    # Mark the source node as visited and enqueue it
-    queue.append(s)
-    visited[s] = True
-
-    # Standard BFS loop
-    while queue:
-        u = queue.popleft()
-
-        # Get all adjacent vertices of the dequeued vertex u.
-        # If an adjacent has not been visited, then mark it
-        # visited and enqueue it.
-        for v, residualcapacity in enumerate(g[u]):
-            if (visited[v] == False) and (residualcapacity > 0):
-                queue.append(v)
-                visited[v] = True
-                parent[v] = u
-
-    # If we reached sink in BFS starting from source, then return
-    # True for path found, else return False.
-    return visited[t]
-
-
-def edmonds_karp_maxflow(graph, source, sink):
-    """
-    Returns the maximum flow from `source` to `sink` in the given `graph`,
-    using Edmonds-Karp algorithm.
-
-    Note that `graph` is altered by this function.
-
-    Initially, when there is no flow, the residual graph is just equal to 
-    `graph`. But as we proceed we update `graph` as the representation of the
-    residual graph flow capacities.
-
-    `len(graph)` should give the number of vertices in `graph`.
-    """
-
-    # This array is filled by BFS and to store path
-    parent = [-1] * len(graph)
-
-    max_flow = 0  # There is no flow initially
-
-    # Augment the flow while there is path from source to sink
-    while bfs_sourcetosinkresidualpath(graph, source, sink, parent):
-        # Find minimum residual capacity of the edges along the
-        # path filled by BFS. Or we can say find the maximum flow
-        # through the path found.
-        path_flow = float("Inf")
-        s = sink
-        while s != source:
-            path_flow = min(path_flow, graph[parent[s]][s])
-            s = parent[s]
-
-        # Add path flow to overall flow
-        max_flow += path_flow
-
-        # update residual capacities of the edges and reverse edges
-        # along the path
-        v = sink
-        while v != source:
-            u = parent[v]
-            graph[u][v] -= path_flow
-            graph[v][u] += path_flow
-            v = u
-
-    return max_flow
+        If `(v1, v2)` is not an edge in `E`, return zero.
+        """
+        return self.degrees[v1] + self.degrees[v2] - 1 if self.E[v1][v2] else 0
 
 
 def tests():
@@ -330,10 +308,56 @@ def tests():
     assert not btt_sequence_terminates(21, 19)
     assert btt_sequence_terminates(13, 19)
 
+    # graph for trainer bananas list [1, 3, 7, 13, 19, 21]
+    graph = AdjacencyGraph(6)
+    tbl = [1, 3, 7, 13, 19, 21]
+    for i in range(5):
+        for j in range(i + 1, 6):
+            if not btt_sequence_terminates(tbl[i], tbl[j]):
+                graph.addedge(i, j)
+    graph.addedge(0, 0)
+    graph.deledge(0, 0)
+    graph.addedge(0, 3)
+    assert not graph.inE(0, 0)
+    assert graph.inE(0, 3)
+    assert graph.inE(4, 5)
+    assert graph.inE(5, 4)
+    assert graph.inV(5)
+    assert graph.cardV == 6
+    assert graph.cardE == 9
+    assert graph.degrees == [3, 2, 3, 3, 4, 3]
+    assert graph.cardE == 9
+    assert graph.edgeincidencecount(4, 5) == 6
+    assert graph.edgeincidencecount(0, 3) == 5
+    assert graph.edgeincidencecount(0, 1) == 0
+    graph.disconnectvertex(4)
+    assert not graph.inE(4, 5)
+    assert not graph.inE(5, 4)
+    assert graph.inE(0, 5)
+    assert graph.cardV == 6
+    assert graph.cardE == 5
+    assert graph.degrees == [2, 1, 2, 3, 0, 2]
+    assert graph.edgeincidencecount(4, 5) == 0
+    assert graph.edgeincidencecount(0, 3) == 4
+
     assert solution([]) == 0
     assert solution([2]) == 1
-    assert solution([1,1]) == 2
-    assert solution([1,1,1]) == 3
+    assert solution([1, 1]) == 2
+    assert solution([1, 1, 1]) == 3
+    assert solution([1, 2, 3]) == 1
+    assert solution([1, 2, 3, 4]) == 0
+    assert solution([2, 3, 4, 5]) == 0
+    assert solution([1, 2, 3, 4, 5]) == 1
+    assert solution([2, 3, 4, 5, 6]) == 1
+    assert solution([3, 4, 5, 6, 7]) == 1
+    assert solution([1, 2, 3, 4, 5, 6]) == 0
+    assert solution([2, 3, 4, 5, 6, 7]) == 0
+    assert solution([3, 4, 5, 6, 7, 8]) == 0
+    assert solution([1, 3, 5, 7, 9]) == 1
+    assert solution([3, 5, 7, 9, 11]) == 1
+    assert solution([1, 3, 5, 7, 9, 11]) == 0
+    assert solution([1, 3, 5, 7, 9, 23]) == 0
+    assert solution([2, 4, 6, 12]) == 0
 
     assert solution([1, 7, 3, 21, 13, 19]) == 0
 
