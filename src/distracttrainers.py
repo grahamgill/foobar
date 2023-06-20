@@ -279,8 +279,18 @@ class AdjacencyGraph:
         one for an edge of the graph.
 
         If `(v1, v2)` is not an edge in `E`, return zero.
+
+        In the special case that `v1 == v2` and `(v1, v2)` is in E, just return the degree of `v1`.
+        We're not allowing edges with multiplicity in this graph.
         """
-        return self.degrees[v1] + self.degrees[v2] - 1 if self.E[v1][v2] else 0
+
+        if self.E[v1][v2]:
+            if v1 == v2:
+                return self.degrees[v1]
+            else:
+                return self.degrees[v1] + self.degrees[v2] - 1
+        else:
+            return 0
 
 
 def tests():
@@ -340,6 +350,14 @@ def tests():
     assert graph.cardE == 5
     assert graph.degrees == [2, 1, 2, 3, 0, 2]
     assert graph.edgeincidencecount(4, 5) == 0
+    assert graph.edgeincidencecount(0, 3) == 4
+    graph.addedge(3, 3)
+    assert graph.degrees[3] == 4
+    assert graph.edgeincidencecount(3, 3) == 4
+    assert graph.edgeincidencecount(0, 3) == 5
+    graph.deledge(3, 3)
+    assert graph.degrees[3] == 3
+    assert graph.edgeincidencecount(3, 3) == 0
     assert graph.edgeincidencecount(0, 3) == 4
 
     assert solution([]) == 0
