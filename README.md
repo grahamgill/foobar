@@ -1,1 +1,1 @@
-# Miscellaneous scripts and snippets
+# Google foobar solutions
