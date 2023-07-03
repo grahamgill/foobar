@@ -1,0 +1,260 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\begin_modules
+theorems-starred
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref page
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Terminating sequences of Bunny Trainer Transforms
+\end_layout
+
+\begin_layout Author
+Graham Gill
+\end_layout
+
+\begin_layout Date
+2023-07-03
+\end_layout
+
+\begin_layout Standard
+In this note, we prove a necessary and sufficient condition for the termination
+ of Bunny Trainer Transform sequences.
+\end_layout
+
+\begin_layout Definition*
+A 
+\emph on
+Bunny Trainer Transform
+\emph default
+ (
+\emph on
+BTT
+\emph default
+) is the following function on pairs of nonnegative integers 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Definition*
+\begin_inset Formula 
+\begin{eqnarray*}
+BTT(m,n) & = & \begin{cases}
+BTT(n,m) & m>n\\
+(2m,n-m) & 3m\le n\\
+(n-m,2m) & m\le n<3m
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The BTT represents the outcome of a match where the bunny trainer corresponding
+ to the smaller integer (e.g.
+ 
+\begin_inset Formula $m$
+\end_inset
+
+ in (
+\begin_inset Formula $m,n)$
+\end_inset
+
+) bets the entire position value 
+\begin_inset Formula $m$
+\end_inset
+
+ and wins.
+ BTT is defined in such a way that if 
+\begin_inset Formula $(x,y)=BTT(m,n)$
+\end_inset
+
+ then 
+\begin_inset Formula $x\le y$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Definition*
+A BTT sequence 
+\emph on
+terminates
+\emph default
+ or is 
+\emph on
+terminating 
+\emph default
+when 
+\begin_inset Formula $BTT^{k}(m,n)=(0,p)$
+\end_inset
+
+ for some nonnegative integers 
+\begin_inset Formula $k$
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+.
+ If no such 
+\begin_inset Formula $k$
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+ exist, then the BTT sequence is 
+\emph on
+nonterminating
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+That is to say, the BTT sequence terminates when successive matches lead
+ to one of the bunny trainers losing everything.
+ We have 
+\begin_inset Formula $BTT(0,p)=(0,p)$
+\end_inset
+
+, so the BTT sequence terminates if it eventually reaches a fixed point
+ where the first integer in the pair is zero.
+\end_layout
+
+\begin_layout Definition*
+The 
+\emph on
+terminating condition
+\emph default
+ (
+\emph on
+TC
+\emph default
+) for a pair of nonnegative integers 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+, at least one of which is positive, is the following:
+\begin_inset Formula 
+\[
+\frac{m+n}{\gcd(m,n)}=2^{k}
+\]
+
+\end_inset
+
+for some nonnegative integer 
+\begin_inset Formula $k$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Theorem*
+A pair of nonnegative integers 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ has a terminating BTT sequence if and only if 
+\begin_inset Formula $m=n=0$
+\end_inset
+
+ or the pair meets the terminating condition.
+\end_layout
+
+\begin_layout Proof
+
+\end_layout
+
+\end_body
+\end_document
