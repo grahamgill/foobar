@@ -213,7 +213,47 @@ That is to say, the BTT sequence terminates when successive matches lead
 \end_layout
 
 \begin_layout Definition*
-The 
+A pair of nonnegative integers 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies the 
+\emph on
+terminating condition with exponent
+\emph default
+ 
+\begin_inset Formula $k$
+\end_inset
+
+ (
+\emph on
+TC-
+\emph default
+
+\begin_inset Formula $k$
+\end_inset
+
+), if for nonnegative integer 
+\begin_inset Formula $k$
+\end_inset
+
+ we have
+\begin_inset Formula 
+\[
+m+n=2^{k}\gcd(m,n).
+\]
+
+\end_inset
+
+(We take 
+\begin_inset Formula $\gcd(0,0)=0$
+\end_inset
+
+ by definition.) More generally the pair 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ is said to satisfy the 
 \emph on
 terminating condition
 \emph default
@@ -221,19 +261,262 @@ terminating condition
 \emph on
 TC
 \emph default
-) for a pair of nonnegative integers 
+) if for some nonnegative integer 
+\begin_inset Formula $k$
+\end_inset
+
+ it satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proposition
+If 
 \begin_inset Formula $(m,n)$
 \end_inset
 
-, at least one of which is positive, is the following:
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+ for some positive integer 
+\begin_inset Formula $k$
+\end_inset
+
+, then 
+\begin_inset Formula $BTT(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $(k-1)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+\begin_inset Formula $(0,0)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+ for all nonnegative integers 
+\begin_inset Formula $k$
+\end_inset
+
+, and 
+\begin_inset Formula $BTT(0,0)=(0,0)$
+\end_inset
+
+, so the proposition is true trivially in this case.
+\end_layout
+
+\begin_layout Proof
+\begin_inset Formula $(0,n)$
+\end_inset
+
+ for a positive integer 
+\begin_inset Formula $n$
+\end_inset
+
+ only satisfies TC-
+\begin_inset Formula $0$
+\end_inset
+
+ and hence does not meet the condition of the proposition.
+\end_layout
+
+\begin_layout Proof
+So without loss of generality, we can assume that 
+\begin_inset Formula $0<m\le n$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $d=\gcd(m,n)$
+\end_inset
+
+, and let 
+\begin_inset Formula $d'=\gcd(2m,n-m)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+We claim 
+\begin_inset Formula $d'=2d$
+\end_inset
+
+.
+ Certainly 
+\begin_inset Formula $2d|2m$
+\end_inset
+
+ since 
+\begin_inset Formula $d|m$
+\end_inset
+
+, and since 
+\begin_inset Formula $d|n$
+\end_inset
+
+ also then 
+\begin_inset Formula $d|(n-m)$
+\end_inset
+
+.
+ But 
 \begin_inset Formula 
 \[
-\frac{m+n}{\gcd(m,n)}=2^{k}
+\frac{m}{d}+\frac{n}{d}=2^{k}
 \]
 
 \end_inset
 
-for some nonnegative integer 
+is even as 
+\begin_inset Formula $k>0$
+\end_inset
+
+, and so both integers 
+\begin_inset Formula $m/d$
+\end_inset
+
+, 
+\begin_inset Formula $n/d$
+\end_inset
+
+ are odd.
+ (They can't both be even integers because then 
+\begin_inset Formula $d$
+\end_inset
+
+ would not be the 
+\emph on
+greatest
+\emph default
+ common divisor of 
+\begin_inset Formula $m$
+\end_inset
+
+ and 
+\begin_inset Formula $n$
+\end_inset
+
+.) It follows that 
+\begin_inset Formula 
+\[
+\frac{n-m}{d}=\frac{n}{d}-\frac{m}{d}
+\]
+
+\end_inset
+
+is an even integer, and so 
+\begin_inset Formula $2d|(n-m)$
+\end_inset
+
+.
+ Thus 
+\begin_inset Formula $2d|d'$
+\end_inset
+
+, being a divisor both of 
+\begin_inset Formula $2m$
+\end_inset
+
+ and 
+\begin_inset Formula $n-m$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+Now suppose 
+\begin_inset Formula $d'=2dq$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula 
+\[
+\frac{2m}{d'}=\frac{m}{dq}
+\]
+
+\end_inset
+
+is an integer, which contradicts 
+\begin_inset Formula $d=\gcd(m,n)$
+\end_inset
+
+ unless 
+\begin_inset Formula $q=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+Finally since 
+\begin_inset Formula $BTT(m,n)=(2m,n-m)$
+\end_inset
+
+ or 
+\begin_inset Formula $(n-m,2m)$
+\end_inset
+
+, and
+\begin_inset Formula 
+\[
+2m+(n-m)=m+n=2^{k}d=2^{k-1}d',
+\]
+
+\end_inset
+
+the proposition is established.
+\end_layout
+
+\begin_layout Proposition*
+If 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+ for some positive integer 
+\begin_inset Formula $k$
+\end_inset
+
+, then every point in the preimage 
+\begin_inset Formula $BTT^{\text{-}1}(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $(k+1)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+\begin_inset Formula $BTT^{\text{-}1}(0,0)=\{(0,0)\}$
+\end_inset
+
+, so the claim is trivially true for 
+\begin_inset Formula $(0,0)$
+\end_inset
+
+ as it satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+ for all nonnegative integers 
 \begin_inset Formula $k$
 \end_inset
 
@@ -245,11 +528,8 @@ A pair of nonnegative integers
 \begin_inset Formula $(m,n)$
 \end_inset
 
- has a terminating BTT sequence if and only if 
-\begin_inset Formula $m=n=0$
-\end_inset
-
- or the pair meets the terminating condition.
+ has a terminating BTT sequence if and only if the pair satisfies the terminatin
+g condition.
 \end_layout
 
 \begin_layout Proof
