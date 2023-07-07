@@ -7,7 +7,7 @@
 \textclass article
 \use_default_options true
 \begin_modules
-theorems-starred
+theorems-ams
 \end_modules
 \maintain_unincluded_children false
 \language english
@@ -39,10 +39,11 @@ theorems-starred
 \pdf_bookmarksopen false
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks true
-\pdf_pdfborder false
-\pdf_colorlinks false
+\pdf_pdfborder true
+\pdf_colorlinks true
 \pdf_backref page
 \pdf_pdfusetitle true
+\pdf_quoted_options "linkcolor=blue, citecolor=red, urlcolor=green, filecolor=gray"
 \papersize default
 \use_geometry false
 \use_package amsmath 1
@@ -138,7 +139,7 @@ BTT(n,m) & m>n\\
 \end_layout
 
 \begin_layout Standard
-The BTT represents the outcome of a match where the bunny trainer corresponding
+BTT represents the outcome of a match where the bunny trainer corresponding
  to the smaller integer (e.g.
  
 \begin_inset Formula $m$
@@ -273,6 +274,12 @@ TC
 \end_layout
 
 \begin_layout Proposition
+\begin_inset CommandInset label
+LatexCommand label
+name "prop:BTT-satisfies-TC"
+
+\end_inset
+
 If 
 \begin_inset Formula $(m,n)$
 \end_inset
@@ -480,7 +487,13 @@ Finally since
 the proposition is established.
 \end_layout
 
-\begin_layout Proposition*
+\begin_layout Proposition
+\begin_inset CommandInset label
+LatexCommand label
+name "prop:BTT-preimage-satisfies-TC"
+
+\end_inset
+
 If 
 \begin_inset Formula $(m,n)$
 \end_inset
@@ -489,7 +502,7 @@ If
 \begin_inset Formula $k$
 \end_inset
 
- for some positive integer 
+ for some nonnegative integer 
 \begin_inset Formula $k$
 \end_inset
 
@@ -497,18 +510,64 @@ If
 \begin_inset Formula $BTT^{\text{-}1}(m,n)$
 \end_inset
 
- satisfies TC-
+ satisfies
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+TC-
+\begin_inset Formula $0$
+\end_inset
+
+ or TC-
+\begin_inset Formula $1$
+\end_inset
+
+, if 
+\begin_inset Formula $k=0$
+\end_inset
+
+,
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+and if the preimage 
+\begin_inset Formula $BTT^{\text{-}1}(m,n)$
+\end_inset
+
+ is nonempty, it contains points satisfying TC-
+\begin_inset Formula $0$
+\end_inset
+
+;
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+\begin_inset CommandInset label
+LatexCommand label
+name "enu:BTT-preimage-satisfies-TC-k-gt-0"
+
+\end_inset
+
+TC-
 \begin_inset Formula $(k+1)$
+\end_inset
+
+, if 
+\begin_inset Formula $k>0$
 \end_inset
 
 .
 \end_layout
 
+\end_deeper
 \begin_layout Proof
 \begin_inset Formula $BTT^{\text{-}1}(0,0)=\{(0,0)\}$
 \end_inset
 
-, so the claim is trivially true for 
+, so both claims are trivially true for 
 \begin_inset Formula $(0,0)$
 \end_inset
 
@@ -523,6 +582,510 @@ If
 .
 \end_layout
 
+\begin_layout Proof
+Also 
+\begin_inset Formula $BTT^{\text{-}1}(m,n)$
+\end_inset
+
+ is the empty set when 
+\begin_inset Formula $m>n$
+\end_inset
+
+, so both claims are trivially true in this case also.
+\end_layout
+
+\begin_deeper
+\begin_layout Case
+\begin_inset CommandInset label
+LatexCommand label
+name "case:BTT-preimage-satisfies-TC-0"
+
+\end_inset
+
+TC-
+\begin_inset Formula $0$
+\end_inset
+
+:
+\begin_inset Newline newline
+\end_inset
+
+So suppose 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $0$
+\end_inset
+
+.
+ That is, 
+\begin_inset Formula $m+n=\gcd(m,n)$
+\end_inset
+
+.
+ If both 
+\begin_inset Formula $m$
+\end_inset
+
+ and 
+\begin_inset Formula $n$
+\end_inset
+
+ are positive this is impossible, since then 
+\begin_inset Formula $m+n>\max(m,n)$
+\end_inset
+
+ whereas 
+\begin_inset Formula $\gcd(m,n)\le\min(m,n)$
+\end_inset
+
+.
+ Hence 
+\begin_inset Formula $m=0$
+\end_inset
+
+ or 
+\begin_inset Formula $n=0$
+\end_inset
+
+.
+ Without loss of generality we may assume that 
+\begin_inset Formula $m=0$
+\end_inset
+
+, 
+\begin_inset Formula $n>0$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+If 
+\begin_inset Formula $n$
+\end_inset
+
+ is odd, then 
+\begin_inset Formula $BTT^{\text{-1}}(0,n)=\{(0,n),(n,0)\}$
+\end_inset
+
+, and the first claim is satisfied.
+\begin_inset Newline newline
+\end_inset
+
+If 
+\begin_inset Formula $n=2p$
+\end_inset
+
+ is even, then 
+\begin_inset Formula $BTT^{\text{-1}}(0,n)=\{(0,n),(n,0),(p,p)\}$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $p>0$
+\end_inset
+
+, 
+\begin_inset Formula $(p,p)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $1$
+\end_inset
+
+, and again the first claim is established.
+\end_layout
+
+\begin_layout Case
+TC-
+\begin_inset Formula $k$
+\end_inset
+
+ for 
+\begin_inset Formula $k>0$
+\end_inset
+
+:
+\begin_inset Newline newline
+\end_inset
+
+Suppose 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+, and without loss suppose 
+\begin_inset Formula $0<m\le n$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+If one of 
+\begin_inset Formula $m,n$
+\end_inset
+
+ is odd and one is even, then 
+\begin_inset Formula $m+n$
+\end_inset
+
+ is odd, which is impossible since 
+\begin_inset Formula $2^{k}\gcd(m,n)$
+\end_inset
+
+ is even when 
+\begin_inset Formula $k>0$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+If 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ is in the image of 
+\begin_inset Formula $BTT$
+\end_inset
+
+ then one of 
+\begin_inset Formula $m,n$
+\end_inset
+
+ must be even and hence both must be even, since 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+.
+ Therefore if both 
+\begin_inset Formula $m,n$
+\end_inset
+
+ are odd, 
+\begin_inset Formula $BTT^{\text{-}1}(m,n)$
+\end_inset
+
+ is the empty set and the second claim is satisfied.
+\begin_inset Newline newline
+\end_inset
+
+So now assume that 
+\begin_inset Formula $m=2p$
+\end_inset
+
+ and 
+\begin_inset Formula $n=2q$
+\end_inset
+
+ for some positive integers 
+\begin_inset Formula $p\le q$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Suppose that 
+\begin_inset Formula $(u,v)\in BTT^{\text{-1}}(m,n)$
+\end_inset
+
+, with 
+\begin_inset Formula $u\le v$
+\end_inset
+
+.
+ Then we have 
+\begin_inset Formula $(m,n)\in\{(2u,v-u),(v-u,2u)\}$
+\end_inset
+
+.
+ It follows that 
+\begin_inset Formula $(u,v)=(p,2q+p)$
+\end_inset
+
+ or 
+\begin_inset Formula $(u,v)=(q,2p+q)$
+\end_inset
+
+.
+ (So in fact 
+\begin_inset Formula $u<v$
+\end_inset
+
+.) Let 
+\begin_inset Formula $d=\gcd(m,n)$
+\end_inset
+
+.
+ 
+\begin_inset Formula $d$
+\end_inset
+
+ is certainly even, and we know from the proof of Proposition 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "prop:BTT-satisfies-TC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that 
+\begin_inset Formula $2p/d$
+\end_inset
+
+ and 
+\begin_inset Formula $2q/d$
+\end_inset
+
+ are both odd.
+\begin_inset Newline newline
+\end_inset
+
+Consider when 
+\begin_inset Formula $(u,v)=(p,2q+p)$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $d'=\gcd(p,2q+p)$
+\end_inset
+
+.
+ We claim that 
+\begin_inset Formula $d=2d'$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Certainly 
+\begin_inset Formula $d'|p$
+\end_inset
+
+ and 
+\begin_inset Formula $d'|(2q+p)$
+\end_inset
+
+ together imply that 
+\begin_inset Formula $d'|2p$
+\end_inset
+
+ and 
+\begin_inset Formula $d'|2q$
+\end_inset
+
+.
+ Hence 
+\begin_inset Formula $d'|d$
+\end_inset
+
+.
+ Then we can write 
+\begin_inset Formula $d=sd'$
+\end_inset
+
+ for some positive integer 
+\begin_inset Formula $s$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Since 
+\begin_inset Formula $d$
+\end_inset
+
+ is even, write 
+\begin_inset Formula $d=2r$
+\end_inset
+
+ for some positive integer 
+\begin_inset Formula $r$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $d|2p$
+\end_inset
+
+ and 
+\begin_inset Formula $d|2q$
+\end_inset
+
+ together imply that 
+\begin_inset Formula $r|p$
+\end_inset
+
+ and 
+\begin_inset Formula $r|q$
+\end_inset
+
+ and so 
+\begin_inset Formula $r|(2q+p)$
+\end_inset
+
+.
+ From this it follows that 
+\begin_inset Formula $r|d'$
+\end_inset
+
+.
+ So write 
+\begin_inset Formula $d'=tr$
+\end_inset
+
+ for some positive integer 
+\begin_inset Formula $t$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Putting the previous statements together, we see 
+\begin_inset Formula $2r=d=str$
+\end_inset
+
+, and so 
+\begin_inset Formula $st=2$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $s=1$
+\end_inset
+
+, 
+\begin_inset Formula $t=2$
+\end_inset
+
+ then 
+\begin_inset Formula $d=d'$
+\end_inset
+
+.
+ But then 
+\begin_inset Formula $d'|p$
+\end_inset
+
+ means that 
+\begin_inset Formula $d|p$
+\end_inset
+
+ and so 
+\begin_inset Formula $2p/d$
+\end_inset
+
+ must be even, a contradiction.
+ The only remaining possibility is that 
+\begin_inset Formula $s=2$
+\end_inset
+
+, 
+\begin_inset Formula $t=1$
+\end_inset
+
+ and so 
+\begin_inset Formula $d=2d'$
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Now we can conclude that 
+\begin_inset Formula 
+\[
+p+(2q+p)=m+n=2^{k}d=2^{k+1}d',
+\]
+
+\end_inset
+
+and so 
+\begin_inset Formula $(u,v)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $(k+1)$
+\end_inset
+
+, which was to be shown.
+\begin_inset Newline newline
+\end_inset
+
+We have not used the fact that 
+\begin_inset Formula $p\le q$
+\end_inset
+
+, and so symmetry allows us to make a completely analogous argument to show
+ that 
+\begin_inset Formula $(u,v)=(q,2p+q)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $(k+1)$
+\end_inset
+
+ also.
+\begin_inset Newline newline
+\end_inset
+
+If instead 
+\begin_inset Formula $u>v$
+\end_inset
+
+, we can make the same arguments above with 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ interchanged, since 
+\begin_inset Formula $BTT(u,v)=BTT(v,u)$
+\end_inset
+
+ by definition.
+ We've shown, by construction, that when 
+\begin_inset Formula $m\le n$
+\end_inset
+
+ are both even, positive and 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+, then 
+\begin_inset Formula $BTT^{\text{-1}}(m,n)$
+\end_inset
+
+ is nonempty and every point in it satisfies TC-
+\begin_inset Formula $(k+1)$
+\end_inset
+
+, completing the proof of the second claim.
+\end_layout
+
+\end_deeper
 \begin_layout Theorem*
 A pair of nonnegative integers 
 \begin_inset Formula $(m,n)$
@@ -533,7 +1096,327 @@ g condition.
 \end_layout
 
 \begin_layout Proof
+If 
+\begin_inset Formula $m=0$
+\end_inset
 
+ then 
+\begin_inset Formula $(0,n)=BTT^{k}(0,n)$
+\end_inset
+
+ for any nonnegative 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $n=0$
+\end_inset
+
+ and 
+\begin_inset Formula $m>0$
+\end_inset
+
+ then 
+\begin_inset Formula $BTT^{k}(m,0)=(0,m)$
+\end_inset
+
+ for any positive 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ Thus 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ has a terminating BTT sequence when 
+\begin_inset Formula $m=0$
+\end_inset
+
+ or 
+\begin_inset Formula $n=0$
+\end_inset
+
+, and we can see that such 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ also satisfy TC-
+\begin_inset Formula $0$
+\end_inset
+
+.
+ This establishes the theorem when 
+\begin_inset Formula $m=0$
+\end_inset
+
+ or 
+\begin_inset Formula $n=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+Now suppose that 
+\begin_inset Formula $m,n$
+\end_inset
+
+ are positive integers such that 
+\begin_inset Formula $BTT(m,n)=(0,p)$
+\end_inset
+
+.
+ 
+\begin_inset Formula $p$
+\end_inset
+
+ must be positive and even, since 
+\begin_inset Formula $BTT^{\text{-1}}(0,0)=\{(0,0)\}$
+\end_inset
+
+ and 
+\begin_inset Formula $BTT^{\text{-1}}(0,p)=\{(0,p),(p,0)\}$
+\end_inset
+
+ when 
+\begin_inset Formula $p$
+\end_inset
+
+ is positive and odd, as we've seen in the proof of Proposition 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "prop:BTT-preimage-satisfies-TC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, in Case 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "case:BTT-preimage-satisfies-TC-0"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ So also from there we know that we must have 
+\begin_inset Formula $m=n=p/2$
+\end_inset
+
+.
+ 
+\begin_inset Formula $(p/2,p/2)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+If 
+\begin_inset Formula $m,n$
+\end_inset
+
+ are positive integers such that 
+\begin_inset Formula $BTT^{k}(m,n)=(0,p)$
+\end_inset
+
+ for some 
+\begin_inset Formula $k>1$
+\end_inset
+
+, with 
+\begin_inset Formula $k$
+\end_inset
+
+ the smallest positive integer for which the equation is true, then we will
+ write 
+\begin_inset Formula $BTT(u,v)=(0,p)$
+\end_inset
+
+ where 
+\begin_inset Formula $(u,v)=BTT^{k-1}(m,n)$
+\end_inset
+
+.
+ Now 
+\begin_inset Formula $u,v$
+\end_inset
+
+ are both positive integers (otherwise 
+\begin_inset Formula $k$
+\end_inset
+
+ is not the smallest positive integer for which 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $BTT^{k}(m,n)=(0,p)$
+\end_inset
+
+ holds), and from the previous paragraph we know that 
+\begin_inset Formula $(u,v)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $1$
+\end_inset
+
+.
+ But 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ is in the 
+\begin_inset Formula $(k-1)$
+\end_inset
+
+-fold 
+\begin_inset Formula $BTT$
+\end_inset
+
+ preimage of 
+\begin_inset Formula $(u,v)$
+\end_inset
+
+, i.e.
+ 
+\begin_inset Formula $(m,n)\in BTT^{\text{-(k-1)}}(u,v)$
+\end_inset
+
+.
+ Applying Proposition 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "prop:BTT-preimage-satisfies-TC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "enu:BTT-preimage-satisfies-TC-k-gt-0"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, inductively 
+\begin_inset Formula $k-1$
+\end_inset
+
+ times, we find that 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $k$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+We've shown the 
+\emph on
+only if
+\emph default
+ part of the equivalence, and now must show the 
+\emph on
+if
+\emph default
+ case.
+\end_layout
+
+\begin_layout Proof
+Suppose 
+\begin_inset Formula $(m,n)$
+\end_inset
+
+ are positive integers that satisfy TC-
+\begin_inset Formula $k$
+\end_inset
+
+ for some, necessarily positive, integer 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ Applying Proposition 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "prop:BTT-satisfies-TC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ 
+\begin_inset Formula $k$
+\end_inset
+
+ times shows that 
+\begin_inset Formula $BTT^{k}(m,n)$
+\end_inset
+
+ satisfies TC-
+\begin_inset Formula $0$
+\end_inset
+
+.
+ But from Proposition 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "prop:BTT-preimage-satisfies-TC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in Case 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "case:BTT-preimage-satisfies-TC-0"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, this means that 
+\begin_inset Formula $BTT^{k}(m,n)=(0,p)$
+\end_inset
+
+ for some positive integer 
+\begin_inset Formula $p$
+\end_inset
+
+.
 \end_layout
 
 \end_body
