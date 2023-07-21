@@ -1,7 +1,8 @@
 # Google foobar solutions
 
 ## Level 1
-* `bunnyid.py`
+One week to solve the problem. That's not saying you need a week to solve it. It's in case you have other things going on in your life.
+### `bunnyid.py`
 
 ```
 bunnyid(x: int, y: int)
@@ -35,7 +36,8 @@ from:
 Stringify the return result. `x` and `y` are guaranteed to be `int`s in the range 1 to 100000.
 
 ## Level 2
-* `pieslices.py`
+One week to solve each problem.
+### `pieslices.py`
 
 ```
 pieslices(s: str)
@@ -55,7 +57,7 @@ without having more data in favour of needing to do so.
 
 A zero length `s` results in zero pie slices.
 
-* `elevatorversions.py`
+### `elevatorversions.py`
 
 ```
 elevatorversions(l)
@@ -72,3 +74,17 @@ then subsort these by increasing number of components.
 
 No instruction is given on comparing e.g. "1.01" vs. "1.1". We'll try first off dropping the leading zeros and see
 if the verifier is happy with that, so that ["1.01", "1.1"] will return ["1.1", "1.1"]. 
+
+## Level 3
+One week to solve each problem.
+### `xorqueue.py`
+
+### `eventualmarkov.py`
+
+### `bombsbaby.py`
+
+## Level 4
+Fifteen days to solve each problem.
+### `minionkeys.py`
+
+### `distracttrainers.py`
