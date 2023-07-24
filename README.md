@@ -78,6 +78,36 @@ if the verifier is happy with that, so that ["1.01", "1.1"] will return ["1.1", 
 ## Level 3
 One week to solve each problem.
 ### `xorqueue.py`
+```
+xorqueue(start: int, length: int)
+```
+Equivalent to forming a square matrix of size `length**2`, consisting of the integers
+from `start` to `start + length**2 -1` inclusive, in row major order, then `xor`ing the 
+entries in the upper anti-triangle of the matrix as the return value.
+
+`start` should be nonnegative.<br>
+`length` should be strictly positive, and such that `start + length**2 - 1 < MAX_WORKER_ID`.<br>
+`MAX_WORKER_ID` is 2 billion.
+
+E.g.
+`xorqueue(17,4)` is equivalent to generating the matrix
+```
+17 18 19 20
+21 22 23 24
+25 26 27 28
+29 30 31 32
+```
+then `xor`ing together the integers of the upper anti-triangle
+```
+17 18 19 20
+21 22 23
+25 26
+29
+```
+to give the result 14.
+
+There may be hundreds of millions of integers we need to `xor` together, so time performance of the 
+solution is paramount. 
 
 ### `eventualmarkov.py`
 
