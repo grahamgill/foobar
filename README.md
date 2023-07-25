@@ -5,7 +5,9 @@ too much. Now I have only the one Level 5 problem left to attempt.
 
 I didn't start saving the entire problem text until recently, so I can't reconstruct the original
 problem wording in terms of bunnies, trainers, minions and Commander Lambda. What follows are notes
-for each problem from the comments I included in the solution code.
+for each problem.
+
+foobar requires solutions be written in python 2.7 (or Java).
 
 ## Level 1
 One week to solve the problem. That's not saying you need a week to solve it. It's in case you have other things going on in your life.
@@ -16,7 +18,10 @@ bunnyid(x: int, y: int)
 ```
 Enumerate the $\mathbb N^2$ lattice points along diagonals `x + y = n`
 of increasing 1-norm distance `n` from the origin `(0,0)` in $\mathbb Z^2$.
-Counting should increase with distance along the horizontal axis.
+Counting should increase with distance along the horizontal axis. So, given
+`x` and `y` both positive integers, e.g. `(2,3)`, count the number of lattice
+points `(p,q)` in $\mathbb N^2$ such that `p + q <= x + y`, and if `p + q = x + y`
+then such that `p <= x`.
 
 E.g., count
 ```
@@ -145,6 +150,28 @@ absorbing states), beginning in state `j` (row). Solving the linear system and r
 gives the probabilities of eventually ending in each absorbing state, beginning from state 0.
 
 ### `bombsbaby.py`
+```
+bombgenerations(m: int, f: int)
+```
+`m`: needed number of Mach bombs<br>
+`f`: needed number of Facula bombs<br>
+`bombgenerations(m, f)`: smallest bomb replication generation (>= 0) at which `m`, `f` are achieved,
+  starting from 1 Mach and 1 Facula bomb, or -1 if it is impossible to achieve `m`, `f`.
+
+Bombs replicate from one generation to the next via one of the two rules
+* `(x, y) -> (x + y, y)`
+* `(x, y) -> (x, x + y)`
+
+where `x` is the number of Mach bombs and `y` the number of Facula bombs at a generation.
+
+The description of the problem in foobar was a bit unclear I found, especially the rule describing how the
+bombs replicate. (The purpose of the exercise is to know how many bomb generations you have to wait in order
+to have the right number of Mach and Facula bombs to explode a space station. M and F bombs are self-replicating.)
+
+Performance is critical since `m` and `f` are nonnegative `int`s each no greater than `10**50`. Depending on
+the solution algorithm, `bombgenerations(10**50, 10**50-1)` could take a _long_ time to compute.
+
+I provide both an attempt based on breadth first search of a tree with pruning rules (which I suspected could be too slow, and it certainly was, as my own tests also showed), and a much faster approach which passed the foobar tests which went "backwards" up a tree branch to the root.
 
 ## Level 4
 Fifteen days to solve each problem.
