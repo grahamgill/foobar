@@ -7,7 +7,8 @@ I didn't start saving the entire problem text until recently, so I can't reconst
 problem wording in terms of bunnies, trainers, minions and Commander Lambda. What follows are notes
 for each problem.
 
-foobar requires solutions be written in python 2.7 (or Java).
+foobar requires solutions be written in python 2.7 (or Java), with only a subset of the standard
+library available for use.
 
 ## Level 1
 One week to solve the problem. That's not saying you need a week to solve it. It's in case you have other things going on in your life.
