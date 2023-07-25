@@ -1,4 +1,11 @@
 # Google foobar solutions
+I first started doing foobar after being invited in April 2022. There have been some fun and 
+challenging problems. I've done them on occasions when I felt that real life wouldn't interfere
+too much. Now I have only the one Level 5 problem left to attempt.
+
+I didn't start saving the entire problem text until recently, so I can't reconstruct the original
+problem wording in terms of bunnies, trainers, minions and Commander Lambda. What follows are notes
+for each problem from the comments I included in the solution code.
 
 ## Level 1
 One week to solve the problem. That's not saying you need a week to solve it. It's in case you have other things going on in your life.
@@ -110,6 +117,32 @@ There may be hundreds of millions of integers we need to `xor` together, so time
 solution is paramount. 
 
 ### `eventualmarkov.py`
+```
+eventualmarkov(m)
+```
+`m` is a square matrix of nonnegative `int`s, represented as a list of `n` lists each of length `n`.<br>
+`m[i][j]` records the number of times state `i` was observed to transition to state `j` in experiments.
+
+We're asked to find for each absorbing state the probability of ending up eventually in that absorbing state, beginning from state 0. We're guaranteed that
+* there is at least one absorbing state,
+* there are no absorbing cycles (periodic states).
+
+We're implicitly told to work with the matrix of observations, to treat them as representations of the
+transition probabilities. We're told that some states have been unobserved, that is, both that no transition
+into that state was observed from any state (corresponding to a zero column in `m`) and no transition out of
+that state was observed to any state (corresponding to a zero row in `m`). Absorbing states correspond to a
+zero row in `m`, since once in that state we don't leave it. (The unobserved states are also treated as
+absorbing, although we have no way to get in to these states.)
+
+We're asked to return the probabilities of ending up in the different absorbing states as a list of 
+`int`s, one for each absorbing state, followed by a common denominator. E.g. a return of the list
+`[1,2,3,6]` would indicate three absorbing states, with probabilities of eventually ending up in each
+given by `1/6`, `1/3 = 2/6` and `1/2 = 3/6` respectively.
+
+The solution involves first converting to transition probabilities, then forming an augmented linear system
+with unknowns representing the probabilities of being absorbed into state `k` (column, limited only to
+absorbing states), beginning in state `j` (row). Solving the linear system and reading the top row
+gives the probabilities of eventually ending in each absorbing state, beginning from state 0.
 
 ### `bombsbaby.py`
 
