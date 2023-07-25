@@ -266,5 +266,65 @@ The return value is a list of equal length lists in lexicographic order, giving 
 
 We have the following limits: `m` is an integer in the range 1 to 9, inclusive. `n` is an integer in the range 0 to 9 inclusive.
 
-
 ### `distracttrainers.py`
+```
+solution(trainerbananas)
+```
+`trainerbananas` is a list of the number of bananas possessed by each trainer.
+
+#### Distract the Trainers
+
+The time for the mass escape has come, and you need to distract the bunny trainers so that the workers can make it out! Unfortunately for you, they're watching the bunnies closely. Fortunately, this means they haven't realized yet that the space station is about to explode due to the destruction of the LAMBCHOP doomsday device. Also fortunately, all that time you spent working as first a minion and then a henchman means that you know the trainers are fond of bananas. And gambling. And thumb wrestling.
+
+The bunny trainers, being bored, readily accept your suggestion to play the Banana Games.
+
+You will set up simultaneous thumb wrestling matches. In each match, two trainers will pair off to thumb wrestle. The trainer with fewer bananas will bet all their bananas, and the other trainer will match the bet. The winner will receive all of the bet bananas. You don't pair off trainers with the same number of bananas (you will see why, shortly). You know enough trainer psychology to know that the one who has more bananas always gets over-confident and loses. Once a match begins, the pair of trainers will continue to thumb wrestle and exchange bananas, until both of them have the same number of bananas. Once that happens, both of them will lose interest and go back to supervising the bunny workers, and you don't want THAT to happen!
+
+For example, if the two trainers that were paired started with 3 and 5 bananas, after the first round of thumb wrestling they will have 6 and 2 (the one with 3 bananas wins and gets 3 bananas from the loser). After the second round, they will have 4 and 4 (the one with 6 bananas loses 2 bananas). At that point they stop and get back to training bunnies.
+
+How is all this useful to distract the bunny trainers? Notice that if the trainers had started with 1 and 4 bananas, then they keep thumb wrestling! 1, 4 -> 2, 3 -> 4, 1 -> 3, 2 -> 1, 4 and so on.
+
+Now your plan is clear. You must pair up the trainers in such a way that the maximum number of trainers go into an infinite thumb wrestling loop!
+
+Write a function solution(banana_list) which, given a list of positive integers depicting the amount of bananas the each trainer starts with, returns the fewest possible number of bunny trainers that will be left to watch the workers. Element i of the list will be the number of bananas that trainer i (counting from 0) starts with.
+
+The number of trainers will be at least 1 and not more than 100, and the number of bananas each trainer starts with will be a positive integer no more than 1073741823 (i.e. 2^30 -1). Some of them stockpile a LOT of bananas.
+
+#### Strategy
+
+First we need to determine whether each possible pair of bunny trainers leads to a nonterminating loop of thumb wrestling games, 
+or terminates with both trainers ending up with an equal number of bananas.
+
+To do this we'll first sort the trainers by nondecreasing number of bananas held initially. The termination/nontermination decision 
+function took a bit of work to discover, but not that hard and a proof that it is the right function is provided in a PDF 
+separately at [doc/terminating_bunny_trainer_transforms.pdf](https://github.com/grahamgill/foobar/blob/f5c6ad80b4533b1eadb6fbbd8b1975c1dca0fc17/doc/terminating_bunny_trainer_transforms.pdf "Terminating sequences of Bunny Trainer Transforms").
+
+We'll only consider banana pairs `(m,n)` with `m <= n`, since `(n,m)` gives the same termination/nontermination outcome, and a game 
+match between trainer `i` and trainer `j` is the same game match as between trainer `j` and trainer `i`. The list of trainers sorted by 
+nondecreasing number of bananas held lets us do this easily. If the sorted `N` trainers are labelled `0..N-1`, then we don't need to 
+consider a match between trainer `k` and trainer `k` (which would be terminating in any case), but we only need to consider matches
+between trainer `k` `(0 <= k < N-1)` on the left and trainers `k+1..N-1` on the right. The right hand trainers are guaranteed to have at 
+least as many bananas as trainer `k` because of the sort.
+
+After we know which pairings of bunny trainers will not terminate their games, we need to find the largest set of nonterminating 
+bunny trainer pairs. This is a maximum cardinality matching in a general graph, since in general the graph will have odd cycles
+(e.g. the test example `[1, 7, 3, 21, 13, 19]`) and thus will not be bipartite.
+
+The graph we construct has an edge for all nonterminating bunny trainer matchups. So in the example we have edges `(1, 13), (1, 21), (13, 21)`, giving a 3-cycle.
+
+We'll try a greedy matching algorithm which takes a remaining edge with least incidence to other edges at each step. Removing the edge
+will disconnect its incident vertices from the graph, which will change the edge incidence count for remaining edges. We can get a
+maximal cardinality matching in this way but are not guaranteed to get the maximum cardinality matching. However this is much simpler
+to code up and will run more quickly, so I'm hoping this will be good enough for foobar to trick the bunny trainers. After all I'm
+under the gun here, the station is starting to disintegrate, so I don't have the time for a perfect algorithm.
+
+If it turns out we really need the maximum cardinality matching, we'll have to implement Edmonds' blossom algorithm (or adapt some
+code from online). Hopefully not. There are asymptotically better algorithms than the blossom algorithm but they're more complex and
+their improvement in worst bounds does not guarantee their runtime is any better on average and relatively small examples. There are
+also randomised algorithms giving approximations which, for small examples, may give the maximum with probability only epsilon less than 1. Anyway, we'll see.
+
+If we have a maximal/maximum matching consisting of `K` edges, then that occupies `2K` trainers, leaving `N-2K` watchful trainers. We return
+`N-2K`.
+
+##### Epilogue
+Woohoo! It worked!
